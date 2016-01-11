@@ -1,0 +1,7 @@
+pytest==2.7.2
+sure==1.2.12
+pep8==1.6.2
+csc-pysparse==1.1.1.4
+networkx==1.9.1
+divisi2==2.2.5
+-e git+https://github.com/ocelma/python-recsys#egg=python-recsys
