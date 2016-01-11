@@ -79,4 +79,3 @@ def groupeh(lines):
         group.append(new_group)
         # return when there is only one group left
     return group[0]
-
