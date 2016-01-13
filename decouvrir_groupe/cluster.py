@@ -1,4 +1,7 @@
 from math import sqrt
+from PIL import Image, ImageDraw
+import random
+import pprint
 
 
 def readfile(filename):
@@ -80,8 +83,6 @@ def groupeh(lines):
         # return when there is only one group left
     return group[0]
 
-from PIL import Image, ImageDraw
-
 
 def getheight(clust):
     # Is this an endpoint? Then the height is just 1
@@ -149,8 +150,61 @@ def drawnode(draw, clust, x, y, scaling, labels):
         draw.text((x + 5, y - 7), labels[clust.id], (0, 0, 0))
 
 
+def kclustering(lines, k):
+        # fine min/max of each column, that is
+        # to say, for each point(word), find min and max
+    range_min_max = [(min([line[i] for line in lines]),
+                      max([line[i] for line in lines]))
+                     for i in range(len(lines[0]))]
+    # Each centroid is a vector, with each element placed randomly along the
+    # column of data lines
+    centroid_group = [[random.random() * (range_min_max[i][1] -
+                                          range_min_max[i]
+                                          [0]) + range_min_max[i][0]
+                       for i in range(len(lines[0]))] for j in range(k)]
+    last_match = None
+    # Execute 100 times the process to obtain a 'good enough' result
+    for step in range(100):
+        print 'Step %d executed' % step
+        best_match = [[] for i in range(k)]
+        centroid_matched = 0
+
+        # find best matched centroid for each line of data
+        for i in range(len(lines)):
+            d_min = pearson(centroid_group[centroid_matched], lines[i])
+            for j in range(k):
+                d = pearson(centroid_group[j], lines[i])
+                if d < d_min:
+                    centroid_matched = j
+            best_match[centroid_matched].append(i)
+        # if 2 step returns same centroid results=>finish
+        if last_match == best_match:
+            break
+        last_match = best_match
+
+        # Move centroid to new center, which is average of their member
+        average_sum = [0.0] * len(lines[0])
+        average = [0.0] * len(lines[0])
+        for j in range(k):
+            if len(best_match[j]) > 0:
+                for m in best_match[j]:
+                    line_belong_to_centroid = lines[m]
+                    for i in range(len(line_belong_to_centroid)):
+                        average_sum[i] += line_belong_to_centroid[i]
+                average = [x / len(best_match[j]) for x in average_sum]
+                centroid_group[j] = average
+
+    return best_match
+
+
 def start_clustering():
     blogname, words, data = readfile('blogdata.txt')
     groupe = groupeh(data)
     drawdendrogram(groupe, blogname, jpeg='clustering_result.jpg')
     return groupe
+
+
+def start_kclustering(k):
+    blogname, words, data = readfile('blogdata.txt')
+    best_matched = kclustering(data, k)
+    return best_matched
