@@ -4,6 +4,9 @@ MAINTAINER Appturbo <contact@appturbo.it>
 
 
 COPY . /src
-# RUN pip install -r /src/dev-requirements.txt 
+WORKDIR /src
+RUN ln -s /usr/include/freetype2 /usr/local/include/freetype
+RUN pip install -r /src/dev-requirements.txt 
+
 
 
