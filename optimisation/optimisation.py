@@ -1,8 +1,7 @@
 import time
 import random
-import math
 from tabulate import tabulate
-
+import math
 # Flight schedule
 
 s = [1, 4, 3, 2, 7, 3, 6, 3, 2, 4, 5, 3]
@@ -104,15 +103,39 @@ def randomhillclimbing(domain):
             if cost < best_cost:
                 best_cost = cost
                 solution = neigbhor[i]
-
-        # if there is no change whatso ever , then we have reached the bottom
+        # if there is no change whatsoever between
+        # current cost and best cost , then we have reached the bottom
         if best_cost == current_cost:
             break
     return solution
 
 
+def simulatedannealing(domain, T=10000, cold_temp=0.95, step=1):
+    solution = [random.randint(domain[i][0], domain[i][1])
+                for i in range(len(domain))]
+    # While temperature is still high/This is to
+    # stimulate annealing process in physics to find minima
+    while T > 0.1:
+        i = random.randint(0, len(domain) - 1)
+        displacement = random.randint(-step, step)
+        solution_deplaced = solution[:]
+        solution_deplaced[i] += displacement
+        # Protecting from out of bound
+        if solution_deplaced[i] < domain[i][0]:
+            solution_deplaced[i] = domain[i][0]
+        elif solution_deplaced[i] > domain[i][1]:
+            solution_deplaced[i] = domain[i][1]
+        current_cost = schedulecost(solution)
+        cost_after_displacement = schedulecost(solution_deplaced)
+        if cost_after_displacement < current_cost:
+            solution = solution_deplaced
+        # Cooling down temperature
+        T = T * cold_temp
+    return solution
+
+
 domain = [(0, 8)] * (len(people) * 2)
-s = randomhillclimbing(domain)
+s = simulatedannealing(domain)
 cost = schedulecost(s)
 schedule_flight = flightschedule(s)
 print tabulate(schedule_flight)
