@@ -16,7 +16,7 @@ Then navigate to main repo which contains Dockerfile  and build Docker image<br>
 
 #Requirements:
 UNIX environment. <br />
-Python 2.7 
+Python 2.7 <br>
 Docker
 
 <br />
