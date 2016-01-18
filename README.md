@@ -8,7 +8,7 @@ This is my code to implement algorithm present in book Programmer pour l'Intelli
 <br />
 Make sure Docker is installed in your machine. <br> 
 Then navigate to main repo which contains Dockerfile  and build Docker image<br>
-<br> Execute command <i>Python /.../a.py<i> for execution of desired file . For example<br>
+<br> Execute docker command <i>docker run image_name python /.../a.py</i> for execution of desired file . For example<br>
 <i> docker run collective_intel python optimisation/optimisation.py </i>
 
 
