@@ -54,7 +54,57 @@ class classifier:
         return self.cc.keys()
 
     def train(self, text, cat):
+        """ This function take the text and category of the text to train
+        classifier
+        :param: text entry
+        :param: category of the text
+        :return: None
+        """
         words = getwords(text)
         for feature in words:
             self.addfeature(feature, cat)
             self.addcatcount(cat)
+
+    def prob_cal(self, f, cat):
+        if self.cat_count(cat) == 0:
+            return 0
+        # Prob of a feature = feature count in a cat / total count of a cat
+        return self.features_count(f, cat) / self.cat_count(cat)
+
+    def weightedprob(self, f, cat, weight=1.0, ap=0.5):
+        """ Calculate weighted probablity
+        """
+        # Calculate current probability
+        basicprob = self.prob_cal(f, cat)
+
+        # Count the number of times this feature has appeared in
+        # all categories
+        totals = sum([self.features_count(f, c) for c in self.catlist()])
+
+        # Calculate the weighted average
+        bp = ((weight * ap) + (totals * basicprob)) / (weight + totals)
+        return bp
+
+    def probdocument(self, text, cat):
+        """ Assuming each word in a category is independent from the rest,
+        which is the base of naive bayesian classifier, we calcluate
+        probability of a string flux
+        :param: text flux
+        :param: category
+        :return: probablity P(text|cat)
+        """
+        p = 1
+        words = getwords(text)
+        for feature in words:
+            p *= self.weightedprob(feature, cat)
+        return p
+
+    def prob_cat_given_doc(self, text, cat):
+        """ Pr(cat|doc)=Pr(doc|cat)*Pr(cat)/Pr(doc)
+        Pr(cat|doc): posteriori, Pr(doc|cat) conditional,
+        Pr(cat) priori, Pr(doc) evidence-leave out
+        of Bayesian algo
+        """
+        pro_cat = self.cat_count(cat) / self.count_total_cat
+        prodoc = self.probdocument(text, cat)
+        return pro_cat * prodoc
