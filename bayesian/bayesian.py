@@ -44,8 +44,8 @@ class classifier:
 
     def cat_count(self, cat):
         if cat in self.cc:
-            return self.cc[cat]
-        return 0
+            return float(self.cc[cat])
+        return 0.0
 
     def count_total_cat(self):
         return sum(self.cc.values())
@@ -105,6 +105,17 @@ class classifier:
         Pr(cat) priori, Pr(doc) evidence-leave out
         of Bayesian algo
         """
-        pro_cat = self.cat_count(cat) / self.count_total_cat
+        pro_cat = self.cat_count(cat) / self.count_total_cat()
         prodoc = self.probdocument(text, cat)
         return pro_cat * prodoc
+
+    def bayesian_decision(self, item):
+        max_prob = 0.0
+        decision = None
+        for cat in self.catlist():
+            prob = self.prob_cat_given_doc(item, cat)
+            if prob > max_prob:
+                max_prob = prob
+                decision = cat
+        print 'Decision is %s' % decision
+        return decision
